@@ -1,0 +1,195 @@
+/* DOCUMENT */
+
+html, body {
+    margin: 0;
+}
+
+body {
+    background-color: #e8fcff;
+}
+
+/* HEADER & NAV */
+
+.searchcontainer {
+    margin-top: 20px;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.searchcontainer input {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* WAVES & THE PLACE WHERE THINGS HAPPEN */
+
+.actioncontainer {
+    overflow: hidden;
+    /*min-height: 500px;*/
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 140px;
+    /*position: relative;*/
+    position: absolute;
+}
+
+.wavecontainer {
+    overflow: hidden;
+    top: 50px;
+    left: 0;
+    right: 0;
+    position: absolute;
+}
+
+.wavecontainer.frontwave {
+    z-index: 2;
+    opacity: 0.85;
+}
+
+.wavecontainer.frontwave .wave:before {
+    background-image: radial-gradient(circle at 20px -10px, transparent 24px, rgba(111, 214, 255, 1) 26px);
+}
+
+.wavecontainer.frontwave .wave:after {
+    background-image: radial-gradient(circle at 20px 30px, rgba(111, 214, 255, 1) 24px, transparent 26px);
+}
+
+.wavecontainer.frontwave .underwave {
+    background-color: rgba(111, 214, 255, 1);
+}
+
+.wavecontainer.backwave {
+    z-index: 0;
+}
+
+.wavecontainer.backwave .wave:before {
+    background-image: radial-gradient(circle at 20px -10px, transparent 24px, #aefcff 26px);
+}
+
+.wavecontainer.backwave .wave:after {
+    background-image: radial-gradient(circle at 20px 30px, #aefcff 24px, transparent 26px);
+}
+
+.wavecontainer.backwave .underwave {
+    background-color: #aefcff;
+}
+
+.wave {
+    height: 100px;
+    width: 2000px;
+    position: relative;
+}
+
+.wave:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-repeat: repeat;
+    height: 20px;
+    background-size: 40px 40px;
+}
+
+.wave:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-repeat: repeat;
+    height: 30px;
+    background-size: 80px 40px;
+}
+
+.underwave {
+    position: relative;
+    height: 2000px;
+    width: 3000px;
+    margin-top: -1px;
+}
+
+/* BOATS */
+
+.boatcontainer {
+    top: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    z-index: 1;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.boat {
+    margin: 0 auto;
+}
+
+.boat img {
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* ANIMATIONS */
+
+@keyframes bobble {
+    0% {
+        transform: translate3d(-100px, 40px, 0px);
+        animation-timing-function: ease-in;
+    }
+    50% {
+        transform: translate3d(-50px, 50px, 0px);
+        animation-timing-function: ease-out;
+    }
+    100% {
+        transform: translate3d(-20px, 40px, 0px);
+    }
+}
+
+.bobbler {
+    position: relative;
+    -webkit-animation: bobble 5s infinite; /* Safari 4.0 - 8.0 */
+    animation: bobble 5s infinite;
+}
+
+@keyframes bobble2 {
+    0% {
+        transform: translate3d(-120px, 30px, 0px);
+        animation-timing-function: ease-in;
+    }
+    50% {
+        transform: translate3d(-80px, 55px, 0px);
+        animation-timing-function: ease-out;
+    }
+    100% {
+        transform: translate3d(-40px, 30px, 0px);
+    }
+}
+
+.bobbler2 {
+    position: relative;
+    -webkit-animation: bobble2 5s infinite; /* Safari 4.0 - 8.0 */
+    animation: bobble2 5s infinite;
+}
+
+@keyframes bobble3 {
+    0% {
+        transform: translate3d(0px, 20px, 0px);
+        animation-timing-function: ease-in;
+    }
+    50% {
+        transform: translate3d(0px, 40px, 0px);
+        animation-timing-function: ease-out;
+    }
+    100% {
+        transform: translate3d(0px, 20px, 0px);
+    }
+}
+
+.bobbler3 {
+    position: relative;
+    -webkit-animation: bobble3 6s infinite; /* Safari 4.0 - 8.0 */
+    animation: bobble3 6s infinite;
+}
