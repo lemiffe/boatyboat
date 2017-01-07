@@ -10,6 +10,11 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 - Run start-docker.sh (will stop, remove, build, and start a new container)
 - Should be accessible via port 1338 (e.g. http://localhost:1338)
 
+## Deploying
+
+**Using Dokku:**
+- git push dokku master
+
 ## Setting up Dokku (for deploying)
 
 **Set up the deploy process:**

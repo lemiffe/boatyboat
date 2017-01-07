@@ -6,4 +6,4 @@ FROM nginx
 COPY app /usr/share/nginx/html
 #COPY conf /etc/nginx
 
-EXPOSE 80, 443
+EXPOSE 80 443
