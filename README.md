@@ -31,8 +31,8 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 **Set up the ports:**
 - dokku proxy:ports boatyboat (see list of ports, see the port of your container)
 - If running on a separate port, make sure you proxy 80/443 to your port:
-- dokku proxy:ports-add boatyboat http:80:6000
-- dokku proxy:ports-add boatyboat https:443:6000
+- dokku proxy:ports-add boatyboat http:80:1338
+- dokku proxy:ports-add boatyboat https:443:1338
 
 **Set up letsencrypt:**
 - sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
