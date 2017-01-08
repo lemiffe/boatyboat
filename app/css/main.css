@@ -2,41 +2,79 @@
 
 html, body {
     margin: 0;
+    height: 100%;
 }
 
 body {
-    background-color: #e8fcff;
+    background: #e8fcff; /* Old browsers */
+    background: -moz-linear-gradient(top, #ffffff 0%, #e8fcff 10%, #e8fcff 25%, #ffffff 50%, #e8fcff 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%, #e8fcff 10%, #e8fcff 25%, #ffffff 50%, #e8fcff 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, #e8fcff 10%, #e8fcff 25%, #ffffff 50%, #e8fcff 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8fcff',GradientType=0 ); /* IE6-9 */
 }
 
 /* HEADER & NAV */
 
 .searchcontainer {
     margin-top: 20px;
-    text-align: center;
-    padding: 20px 0;
+    text-align: left;
+    padding: 0;
+}
+
+.searchcontainer .logo {
+    max-height: 33px;
+    margin-top: 4px;
+}
+
+.searchcontainer .logo-sq {
+    max-height: 68px;
+    margin-left: 20px;
+}
+
+.searchcontainer .right {
+    text-align: right;
+    margin: 0 auto;
+}
+
+.searchcontainer .input-group {
+    max-width: 300px;
+    float: right;
+}
+
+@media (max-width: 768px) {
+    .searchcontainer .input-group {
+        margin: 0 auto;
+        margin-right: 20px;
+    }
 }
 
 .searchcontainer input {
-    max-width: 300px;
-    margin: 0 auto;
+    /*border: none 0px #fff;
+    box-shadow: none;
+    -webkit-box-shadow: none;*/
+}
+
+.searchcontainer input:focus {
+    border-color: #ccc;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
 /* WAVES & THE PLACE WHERE THINGS HAPPEN */
 
 .actioncontainer {
-    overflow: hidden;
-    /*min-height: 500px;*/
+    overflow: visible;
     bottom: 0;
     left: 0;
     right: 0;
     top: 140px;
-    /*position: relative;*/
     position: absolute;
 }
 
 .wavecontainer {
     overflow: hidden;
-    top: 50px;
+    top: 150px;
     left: 0;
     right: 0;
     position: absolute;
@@ -61,18 +99,19 @@ body {
 
 .wavecontainer.backwave {
     z-index: 0;
+    opacity: 0.6;
 }
 
 .wavecontainer.backwave .wave:before {
-    background-image: radial-gradient(circle at 20px -10px, transparent 24px, #aefcff 26px);
+    background-image: radial-gradient(circle at 20px -10px, transparent 24px, #b7ebfd 26px);
 }
 
 .wavecontainer.backwave .wave:after {
-    background-image: radial-gradient(circle at 20px 30px, #aefcff 24px, transparent 26px);
+    background-image: radial-gradient(circle at 20px 30px, #b7ebfd 24px, transparent 26px);
 }
 
 .wavecontainer.backwave .underwave {
-    background-color: #aefcff;
+    background-color: #b7ebfd;
 }
 
 .wave {
@@ -112,6 +151,10 @@ body {
 
 /* BOATS */
 
+.betweenwaves {
+    /* contains one or more boatcontainers */
+}
+
 .boatcontainer {
     top: 0;
     left: 0;
@@ -120,6 +163,7 @@ body {
     z-index: 1;
     text-align: center;
     margin: 0 auto;
+    overflow: visible;
 }
 
 .boat {
@@ -130,6 +174,76 @@ body {
     margin: 0 auto;
     padding-left: 20px;
     padding-right: 20px;
+}
+
+.boat.size-canoe.level-sea {
+    margin-top: 170px;
+}
+
+.boat.size-canoe img {
+    height: 130px;
+}
+
+/* BOAT FLAG */
+
+.boat .flagcontainer {
+    position: absolute;
+    top: -240px;
+    left: 50%;
+    z-index: 3;
+    height: 260px;
+    border-left: solid 3px #604933;
+}
+
+.boat .flag {
+    width: 200px;
+    height: 200px;
+}
+
+/* ISLAND */
+
+.island {
+    margin: 0 auto;
+}
+
+.island img {
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 350px;
+}
+
+.island.level-sea {
+    margin-top: 0;
+}
+
+/* HOOK */
+
+.hook {
+    margin: 0 auto;
+    top: -220px;
+    padding-left: 70px;
+}
+
+.boatcontainer.bc-search {
+    /* Hook container gets a bump */
+    z-index: 2;
+}
+
+/* LOADING */
+
+.loadingcontainer {
+    text-align: center;
+    position: absolute;
+    top: 110px;
+    left: 0;
+    right: 30px;
+    z-index: 0;
+    opacity: 0;
+}
+
+.loadingcontainer .uil-ripple-css {
+    margin: 0 auto;
 }
 
 /* ANIMATIONS */
@@ -192,4 +306,96 @@ body {
     position: relative;
     -webkit-animation: bobble3 6s infinite; /* Safari 4.0 - 8.0 */
     animation: bobble3 6s infinite;
+}
+
+.enter {
+    animation: fadein 2s;
+    -webkit-animation: fadein 2s;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+        top: -20px;
+    }
+    to   {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+.enter-slow {
+    animation: fadein 2.2s;
+    -webkit-animation: fadein 2.2s;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+        top: -80px;
+        animation-timing-function: cubic-bezier(0.2,0.5,0.3,1);
+    }
+    to   {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+.enter-low {
+    animation: fadein-low 2.2s;
+    -webkit-animation: fadein-low 2.2s;
+}
+
+@keyframes fadein-low {
+    from {
+        opacity: 0;
+        top: 30px;
+        animation-timing-function: cubic-bezier(0.2,0.5,0.3,1);
+    }
+    to   {
+        opacity: 1;
+        top: 0;
+    }
+}
+
+.exit {
+    animation: fadeout 1.5s;
+    -webkit-animation: fadeout 1.5s;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+        top: 0;
+        -webkit-filter: blur(0px);
+    }
+    to   {
+        opacity: 0;
+        top: 30px;
+        -webkit-filter: blur(3px);
+    }
+}
+
+.hookexit {
+    animation: fadeout 1.5s;
+    -webkit-animation: fadeout 1.5s;
+    opacity: 0;
+    position: absolute;
+    top: -50px;
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+        top: -50px;
+        -webkit-filter: blur(0px);
+    }
+    to   {
+        opacity: 0;
+        top: -450px;
+        -webkit-filter: blur(1px);
+    }
 }

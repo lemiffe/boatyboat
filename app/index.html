@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FloatyBoat</title>
+    <title>BoatyBoat</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/loading.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -17,7 +18,24 @@
 
 <body>
     <div class="searchcontainer container">
-        <input id="search" name="search" type="text" class="form-control" placeholder="Search for a Company">
+        <div class="row">
+            <div class="col-xs-3 col-sm-6 col-md-6 col-lg-6">
+                <img src="images/logo-square.png" alt="BoatyBoat" title="BoatyBoat" class="image-responsive logo-sq hidden-sm hidden-md hidden-lg hidden-xl" />
+                <img src="images/logo.png" alt="BoatyBoat" class="image-responsive logo hidden-xs" />
+            </div>
+            <div class="col-xs-9 col-sm-6 col-md-6 col-lg-6 right">
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></span>
+                    <input id="search" name="search" type="text" class="form-control" placeholder="Enter a company or domain...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loadingcontainer">
+        <div class='uil-ripple-css' style='transform:scale(1);'>
+            <div></div><div></div>
+        </div>
     </div>
 
     <div class="actioncontainer">
@@ -25,10 +43,7 @@
             <div class="wave bobbler2"></div>
             <div class="underwave bobbler2"></div>
         </div>
-        <div class="boatcontainer">
-            <div class="boat bobbler3">
-                <img src="boat.png" class="img-responsive" />
-            </div>
+        <div class="betweenwaves">
         </div>
         <div class="wavecontainer frontwave">
             <div class="wave bobbler"></div>

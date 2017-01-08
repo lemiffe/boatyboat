@@ -3,8 +3,9 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 
 ## Running locally
 
-**Locally (for development):**
-- Pending
+**Locally (using docker-compose):**
+- docker-compose up
+- Access via port 1338 (app folder mounted as a volume!)
 
 **Nginx Docker:**
 - Run start-docker.sh (will stop, remove, build, and start a new container)
@@ -38,4 +39,3 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 - dokku config:set --no-restart boatyboat DOKKU_LETSENCRYPT_EMAIL=your@email.com
 - dokku letsencrypt boatyboat
 - dokku letsencrypt:cron-job --add
-
