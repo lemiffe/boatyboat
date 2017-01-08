@@ -26,7 +26,7 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 **Set up the domain (on the server):**
 - dokku domains boatyboat
 - dokku domains:add boatyboat yourdomain.com
-- dokku config:set boatyboat DOKKU_NGINX_PORT=80
+- dokku config:set boatyboat DOKKU_NGINX_PORT=1338
 
 **Set up the ports:**
 - dokku proxy:ports boatyboat (see list of ports, see the port of your container)
