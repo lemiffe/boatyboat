@@ -1,4 +1,5 @@
 # BoatyBoat
+
 Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 
 ## Running locally
