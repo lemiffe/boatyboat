@@ -40,3 +40,15 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 - dokku config:set --no-restart boatyboat DOKKU_LETSENCRYPT_EMAIL=your@email.com
 - dokku letsencrypt boatyboat
 - dokku letsencrypt:cron-job --add
+
+**Troubleshooting:**
+- Infinite redirects?
+    - Might be that you have 2 nginx services running somehow
+    - service nginx stop
+    - ps aux | grep nginx
+    - kill -9 any remaining processes
+    - service nginx start
+- 502s?
+    - Might be the docker 1.12 issue where sometimes it fails to start a container if on the same IP
+    - dokku ps:rebuild boatyboat
+    - You can add a check to CHECKS and automate this if necessary

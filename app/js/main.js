@@ -2,7 +2,7 @@ var apiUrl = location.protocol.concat("//") + 'localhost:1337';
 if (window.location.hostname !== 'localhost') {
     var http = location.protocol;
     var slashes = http.concat("//");
-    apiUrl = 'api.' + slashes.concat(window.location.hostname);
+    apiUrl = slashes.concat('api.').concat(window.location.hostname);
 }
 var requiredImages = [
     '../images/canoe.svg',
