@@ -52,3 +52,7 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
     - Might be the docker 1.12 issue where sometimes it fails to start a container if on the same IP
     - dokku ps:rebuild boatyboat
     - You can add a check to CHECKS and automate this if necessary
+- After deploy do infinite redirects come back?
+    - If you set DOKKU_NGINX_PORT in your dokku config, unset it on the server
+    - Reboot the server? Then:
+    - dokku ps:rebuildall
