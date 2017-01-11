@@ -16,9 +16,12 @@ body {
 /* HEADER & NAV */
 
 .searchcontainer {
-    margin-top: 20px;
     text-align: left;
     padding: 0;
+}
+
+.searchcontainer .row {
+    margin-top: 20px;
 }
 
 .searchcontainer .logo {
@@ -37,7 +40,7 @@ body {
 }
 
 .searchcontainer .input-group {
-    max-width: 300px;
+    max-width: 250px;
     float: right;
 }
 
@@ -48,17 +51,28 @@ body {
     }
 }
 
+.searchcontainer .input-group-addon {
+    background-color: #78a36f;
+    border-color: #78a36f;
+    cursor: pointer;
+}
+
 .searchcontainer input {
     /*border: none 0px #fff;
     box-shadow: none;
     -webkit-box-shadow: none;*/
+    border-color: #78a36f;
 }
 
 .searchcontainer input:focus {
-    border-color: #ccc;
+    border-color: #78a36f;
     outline: 0;
     -webkit-box-shadow: none;
     box-shadow: none;
+}
+
+.searchcontainer .glyphicon-search {
+    color: #ffffff;
 }
 
 /* WAVES & THE PLACE WHERE THINGS HAPPEN */
@@ -77,6 +91,7 @@ body {
     top: 150px;
     left: 0;
     right: 0;
+    bottom: 0;
     position: absolute;
 }
 
@@ -144,7 +159,7 @@ body {
 
 .underwave {
     position: relative;
-    height: 2000px;
+    height: 100%;
     width: 3000px;
     margin-top: -1px;
 }
@@ -215,6 +230,23 @@ body {
 
 .island.level-sea {
     margin-top: 0;
+}
+
+/* OCTOPUS */
+
+.octo {
+    margin: 0 auto;
+}
+
+.octo img {
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 400px;
+}
+
+.octo.level-sea {
+    margin-top: 45px;
 }
 
 /* HOOK */
@@ -398,4 +430,52 @@ body {
         top: -450px;
         -webkit-filter: blur(1px);
     }
+}
+
+/* BACKGROUND LOADING ANIMATION */
+
+.bg-long-load {
+    opacity: 0;
+    background:url(../images/seigaiha.png);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    content: ' ';
+    display: block;
+    animation: 100s bg-scroll infinite linear;
+}
+
+@keyframes bg-scroll {
+    100% {
+        background-position: 0 -3000px;
+    }
+}
+
+/* SNACKS */
+
+.snackbar {
+    transition-property: opacity, bottom, left, right, width, margin;
+    transition-duration: 0.5s;
+    transition-timing-function: ease;
+    font-size: 14px;
+    min-height: 14px;
+    background-color: #333333;
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    line-height: 22px;
+    padding: 18px 24px;
+    opacity: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0 auto;
+    min-width: 288px;
+    max-width: 568px;
+    z-index: 5;
 }

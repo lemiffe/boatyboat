@@ -55,4 +55,8 @@ Frontend client for [FloatyBoat](https://github.com/lemiffe/floatyboat-fetch)
 - After deploy do infinite redirects come back?
     - If you set DOKKU_NGINX_PORT in your dokku config, unset it on the server
     - Reboot the server? Then:
+    - dokku config:set boatyboat DOKKU_NGINX_SSL_PORT=443 [see this bug](https://github.com/dokku/dokku/issues/2535)
     - dokku ps:rebuildall
+- Still having issues with infinite redirects?
+    - Are you using Cloudflare? Do you have SSL set to "flexible"?
+    - Turn it off, it is the cause of the loop if you are also using letsencrypt!

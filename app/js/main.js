@@ -1,17 +1,25 @@
+// Initialisation variables
 var apiUrl = location.protocol.concat("//") + 'localhost:1337';
 if (window.location.hostname !== 'localhost') {
     var http = location.protocol;
     var slashes = http.concat("//");
     apiUrl = slashes.concat('api.').concat(window.location.hostname);
 }
+
+// State
+var lastSearchString = '';
+var searchStartTime = 0;
+var searching = false;
+
+// Constants
 var requiredImages = [
     '../images/canoe.svg',
     '../images/island.svg',
     '../images/hook.svg',
-    '../images/clouds.png'
+    '../images/octo.svg',
+    '../images/clouds.png',
+    '../images/seigaiha.png'
 ];
-var lastSearchString = '';
-var searchStartTime = 0;
 var BETWEENWAVE_CONTAINER = '.betweenwaves';
 var HOOK_EXIT_TIME = 1500;
 var EXIT_TIME = 1500;
@@ -20,20 +28,34 @@ var ENTER_TIME = 2000;
 var STATUS_NOT_FOUND = 'not found';
 
 $(document).ready(function() {
+    // Search input handler + debouncer
     var searchEl = $('#search');
     searchEl.focus().select().keyup($.debounce(600, handleInput));
+
+    // Search icon click handler
+    $('.searchcontainer .input-group-addon').on('click touchstart', function() {
+        handleInput(null);
+    });
 
     // Pre-load assets (disable search until they load)
     displayLoading();
     searchEl.prop('disabled', true);
     preloadPictures(requiredImages, function(){
+        // After loading initial assets
         hideLoading();
         searchEl.prop('disabled', false);
 
-        // Todo: Handle hashes in URL (to search for a pre-defined company on load)
-        displayIsland();
+        // Display initial state or start search
+        if (window.location.hash && window.location.hash.trim().length > 1) {
+            // Search for company in URL hash (if set)
+            var decodedCompanyName = decodeURIComponent(window.location.hash.trim().replace('#', ''));
+            $('#search').val(decodedCompanyName); // Modifying text does not start search by default
+            startSearch(decodedCompanyName);
+        } else {
+            // First time user experience
+            displayIsland();
+        }
     });
-
 });
 
 function handleInput(e) {
@@ -51,21 +73,17 @@ function handleInput(e) {
 
     } else if (companyName.trim() === '') {
         // Nothing was passed in
-        console.log('skipping due to blank');
         return;
 
     } else if (companyName.length < 2) {
-        console.log('skipping due to length');
         return;
 
-    } else if (e.keyCode === 91 && lastSearchString.trim() === companyName.trim()) {
+    } else if (e && e.keyCode === 91 && lastSearchString.trim() === companyName.trim()) {
         // Tab was pressed and search string is still the same
-        console.log('skipping due to tab & same text');
         return;
 
-    } else if (e.keyCode !== 13 && lastSearchString.trim() === companyName.trim()) {
-        // Skip if not enter and text is the same
-        console.log('skipping due to non-enter & same text');
+    } else if (e && e.keyCode !== 13 && lastSearchString.trim() === companyName.trim()) {
+        // Skip if not enter and text is the same (if click, e is null so it re-searches always)
         return;
     }
 
@@ -74,11 +92,13 @@ function handleInput(e) {
 
 function startSearch(companyName) {
     // Search
-    var searchUrl = apiUrl + '/search/' + encodeURIComponent(companyName);
-    lastSearchString = companyName;
+    var encodedSearch = encodeURIComponent(companyName);
+    var searchUrl = apiUrl + '/search/' + encodedSearch;
     searchStartTime = new Date().getTime();
-
+    searching = true;
+    window.location.hash = encodedSearch;
     displayHook();
+
     $.ajax({
         url: searchUrl,
         dataType: 'json',
@@ -87,18 +107,34 @@ function startSearch(companyName) {
         error: searchError
     });
 
-    // Todo: If search is taking too long (just do a setTimeout that checks searchStartTime), then show 'slow loading'
+    // If search is taking too long, and still searching for the same item, show 'slow search'
+    setTimeout(function() {
+        if (searching === true && lastSearchString === companyName) {
+            displaySearchSlow();
+        }
+    }, 2000);
+
+    lastSearchString = companyName;
 }
 
+/**
+ * Performs a search with the API
+ * The search can return statuses: error, not found, success, full update required, partial update required
+ * @param httpResult
+ * @return void
+ */
 function searchSuccess(httpResult) {
+    searching = false;
     killHook(false); // Kill slowly
     hideLoading(); // Just in case
+    hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
 
     // We got a response, but we couldn't find a company with that name/domain
     if (httpResult && httpResult.status === STATUS_NOT_FOUND) {
         // Todo: Initiate construction of new company!
         killBoats();
         displayIsland(); // will be something different
+        killOcto();
         return;
     }
 
@@ -108,14 +144,17 @@ function searchSuccess(httpResult) {
     }
 
     // We got a response with items!
+    // TODO: Handle other statuses (like partial update required, etc.)
     var results = httpResult.results;
     killIsland();
     killBoats();
-    console.log(results);
+    killOcto();
+    console.log(results); // TODO: Remove
     if (httpResult.count === 1) {
         // Render single item
         var item = results[0];
         var renderFlag = item.gd_ceo && item.gd_ceo.image && item.gd_ceo.image.src;
+        // TODO: Generate container ID here and pass it on to displayBoat (same for function below)
         var boatContainerId = displayBoat('canoe', 'sea', renderFlag);
         if (renderFlag) {
             displayFlag(item.gd_ceo.image.src, boatContainerId, 200, 200);
@@ -135,6 +174,7 @@ function searchSuccess(httpResult) {
 }
 
 function searchError(x) {
+    searching = false;
     var killFast = false;
     var searchEndTime = new Date().getTime();
     if (searchEndTime - searchStartTime < 100) {
@@ -142,11 +182,27 @@ function searchError(x) {
     }
     killHook(killFast);
     hideLoading(); // Just in case
+    hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
+
     console.log(x);
     var companyNotFound = (x.status === 404);
     var serverError = (x.status >= 500 || x.status === 0);
     var badInput = (x.status === 400);
-    // Todo: Handle errors! (maybe new SVG?)
+    fatalError('Pending'); // TODO: Proper error message
+}
+
+function fatalError(message) {
+    // Kill everything again (even though previous function might have killed one or two things)
+    killHook(true);
+    hideLoading();
+    hideSearchSlow();
+    killIsland();
+    killBoats();
+    $('#search').val(''); // Clear search term
+    // Display octopus and message
+    displayOcto();
+
+    // TODO : message (snack + pole!)
 }
 
 function displayHook() {
@@ -208,7 +264,7 @@ function displayIsland() {
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-island');
     if (existingItems.length === 0) {
-        // No boats on screen, enter a new boat
+        // No boats on screen, enter a new island
         var html = '<div class="bc-island boatcontainer enter-low">';
         html += '<div class="island level-sea"><img src="images/island.svg" /></div>';
         html += '</div>';
@@ -238,6 +294,40 @@ function killIsland() {
     }
 }
 
+function displayOcto() {
+    var container = $(BETWEENWAVE_CONTAINER);
+    var existingItems = container.children('.bc-octo');
+    if (existingItems.length === 0) {
+        // No boats on screen, enter a new boat
+        var html = '<div class="bc-octo boatcontainer enter-low">';
+        html += '<div class="octo level-sea bobbler3"><img src="images/octo.svg" /></div>';
+        html += '</div>';
+        container.prepend(html);
+        // Remove enter animation class after 2 seconds (to avoid re-rendering by mistake)
+        setTimeout(function() {
+            container.children('.bc-octo').removeClass('enter-low');
+        }, ENTER_SLOW_TIME);
+    } else {
+        // If bc-octo already exists, make sure it is visible
+        var island = container.children('.bc-octo').first();
+        if (island && island.hasClass('exit') || !island.is(":visible")) {
+            // Only make it 'enter' again if not already visible (or if it was exiting)
+            island.removeClass('exit').addClass('enter-low');
+        }
+    }
+}
+
+function killOcto() {
+    var container = $(BETWEENWAVE_CONTAINER);
+    var existingItems = container.children('.bc-octo');
+    if (existingItems.length > 0) {
+        existingItems.first().removeClass('enter-low').addClass('exit');
+        setTimeout(function() {
+            $('.bc-octo').last().remove();
+        }, EXIT_TIME);
+    }
+}
+
 function displayLoading() {
     $('.loadingcontainer').fadeTo(1200, 0.2);
 }
@@ -245,6 +335,20 @@ function displayLoading() {
 function hideLoading() {
     $('.loadingcontainer').fadeOut('fast');
 }
+
+function displaySearchSlow(hideSnackbar) {
+    if (!hideSnackbar) {
+        openSnackbar("Just a sec...", true);
+    }
+    $('#longtimenoload').addClass('bg-long-load').fadeTo(1000, 0.3);
+}
+
+function hideSearchSlow() {
+    closeSnackbars();
+    $('#longtimenoload').fadeTo(1000, 0).removeClass('bg-long-load');
+}
+
+// Helper Functions:
 
 var preloadPictures = function(pictureUrls, callback) {
     var i,
@@ -301,11 +405,53 @@ function displayFlag(url, boatContainerId, width, height) {
                 var y=5*Math.sin(x/25)+200-162;
                 ctx.drawImage(img, x,0,1,ih,  x,y,1,ih);
             }
-
         }
     }
 }
 
+var openSnackbar = (function() {
+    var previous = null;
+
+    return function(message, doNotAutoClose) {
+        if (previous) {
+            previous.dismiss();
+        }
+        var snackbar = document.createElement('div');
+        snackbar.className = 'snackbar';
+        snackbar.dismiss = function() {
+            this.style.opacity = 0;
+        };
+        var text = document.createTextNode(message);
+        snackbar.appendChild(text);
+        setTimeout(function() {
+            if (previous === this && !doNotAutoClose) {
+                previous.dismiss();
+            }
+        }.bind(snackbar), 5000);
+
+        snackbar.addEventListener('transitionend', function(event, elapsed) {
+            if (event.propertyName === 'opacity' && this.style.opacity == 0) {
+                this.parentElement.removeChild(this);
+                if (previous === this) {
+                    previous = null;
+                }
+            }
+        }.bind(snackbar));
+
+        previous = snackbar;
+        document.body.appendChild(snackbar);
+        // Force the original style to be computed, and then change it to trigger the animations
+        getComputedStyle(snackbar).bottom;
+        snackbar.style.bottom = '0px';
+        snackbar.style.opacity = 1;
+    };
+})();
+
+function closeSnackbars() {
+    $('.snackbar').css('opacity', 0);
+}
+
 cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
-    alert('You rock!');
+    fatalError('Smarty pants!');
+    displaySearchSlow(true);
 });
