@@ -10,13 +10,18 @@ if (window.location.hostname !== 'localhost') {
 var lastSearchString = '';
 var searchStartTime = 0;
 var searching = false;
+var companyCount = 0;
+var currentCompanyIndex = 0;
+var companies = [];
 
 // Constants
 var requiredImages = [
     '../images/canoe.svg',
+    '../images/canoe-build.svg',
     '../images/island.svg',
     '../images/hook.svg',
     '../images/octo.svg',
+    '../images/hammer.svg',
     '../images/clouds.png',
     '../images/seigaiha.png'
 ];
@@ -26,6 +31,10 @@ var EXIT_TIME = 1500;
 var ENTER_SLOW_TIME = 2200;
 var ENTER_TIME = 2000;
 var STATUS_NOT_FOUND = 'not found';
+var STATUS_ERROR = 'error';
+var STATUS_SUCCESS = 'success';
+var STATUS_PARTIAL_UPDATE_REQUIRED = 'partial update required';
+var STATUS_FULL_UPDATE_REQUIRED = 'full update required';
 
 $(document).ready(function() {
     // Search input handler + debouncer
@@ -129,51 +138,23 @@ function searchSuccess(httpResult) {
     hideLoading(); // Just in case
     hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
 
-    // We got a response, but we couldn't find a company with that name/domain
-    if (httpResult && httpResult.status === STATUS_NOT_FOUND) {
-        // Todo: Initiate construction of new company!
-        killBoats();
-        displayIsland(); // will be something different
-        killOcto();
+    // We didn't get a response, or we got one but with count 0 (server has gone mad?)
+    if (
+        !httpResult ||
+        (httpResult.count === 0 && httpResult.status !== STATUS_NOT_FOUND) ||
+        httpResult.status === STATUS_ERROR
+    ) {
+        searchError({status: 500});
         return;
     }
 
-    // We didn't get a response, or we got one but with count 0 (server has gone mad?)
-    if (!httpResult || httpResult.count === 0) {
-        searchError({status: 500});
-    }
-
-    // We got a response with items!
-    // TODO: Handle other statuses (like partial update required, etc.)
-    var results = httpResult.results;
-    killIsland();
-    killBoats();
-    killOcto();
-    console.log(results); // TODO: Remove
-    if (httpResult.count === 1) {
-        // Render single item
-        var item = results[0];
-        var renderFlag = item.gd_ceo && item.gd_ceo.image && item.gd_ceo.image.src;
-        // TODO: Generate container ID here and pass it on to displayBoat (same for function below)
-        var boatContainerId = displayBoat('canoe', 'sea', renderFlag);
-        if (renderFlag) {
-            displayFlag(item.gd_ceo.image.src, boatContainerId, 200, 200);
-        }
-
-    } else {
-        // Render item + show arrows for slider
-        var item = results[0];
-        var renderFlag = item.gd_ceo && item.gd_ceo.image && item.gd_ceo.image.src;
-        var boatContainerId = displayBoat('canoe', 'sea', renderFlag);
-        if (renderFlag) {
-            displayFlag(item.gd_ceo.image.src, boatContainerId, 200, 200);
-        }
-
-        // Todo: Arrows + more boats :P
-    }
+    renderBoats(httpResult);
 }
 
-function searchError(x) {
+/**
+ * @param error
+ */
+function searchError(error) {
     searching = false;
     var killFast = false;
     var searchEndTime = new Date().getTime();
@@ -184,14 +165,115 @@ function searchError(x) {
     hideLoading(); // Just in case
     hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
 
-    console.log(x);
-    var companyNotFound = (x.status === 404);
-    var serverError = (x.status >= 500 || x.status === 0);
-    var badInput = (x.status === 400);
-    fatalError('Pending'); // TODO: Proper error message
+    // Example error: (error.status >= 500 || error.status === 0);
+    fatalError("I have problems... Try again shortly. Sorry!");
+}
+
+/**
+ * Takes in the httpResult of either a creation call or a search call
+ * Displays the boat(s) and/or creates a new company if no results were found
+ * @param httpResult
+ */
+function renderBoats(httpResult) {
+    companies = httpResult.results;
+    companyCount = httpResult.count;
+    currentCompanyIndex = 0;
+
+    switch(httpResult.status) {
+        case STATUS_NOT_FOUND:
+            buildBoat(lastSearchString); // Note: potential race condition, consider sending company as a prop
+            break;
+
+        case STATUS_SUCCESS:
+        case STATUS_PARTIAL_UPDATE_REQUIRED:
+        case STATUS_FULL_UPDATE_REQUIRED:
+            killIsland();
+            killBoats();
+            killOcto();
+            console.log(companies);
+
+            $.each(companies, function(index, company) {
+                // Render single item
+                var renderFlag = company.gd_ceo && company.gd_ceo.image && company.gd_ceo.image.src;
+                var boatContainerId = generateUniqueBoatId(index);
+                var visible = (index === 0);
+                // Todo: Depending on boat status we want to display either a full construction, or a boat and hammer
+                displayBoat('canoe', 'sea', boatContainerId, renderFlag, visible, index, false);
+            });
+
+            if (companyCount > 1) {
+                // Todo: Arrows + more boats :P
+            }
+            break;
+        default:
+            searchError({status: 500});
+            break;
+    }
+}
+
+/**
+ * Creates a new company (that does not exist in our database)
+ * API can return statuses: error (with 'message'), success (where 'results' is a list with companies)
+ * @param companyName
+ */
+function buildBoat(companyName) {
+    killBoats();
+    killIsland();
+    killOcto();
+    var boatContainerId = generateUniqueBoatId(0);
+    displayBoat('canoe-build', 'sea', boatContainerId, false, true, -1, true);
+
+    // Create company
+    var encodedSearch = encodeURIComponent(companyName);
+    var buildUrl = apiUrl + '/company/' + encodedSearch + '/create';
+
+    setTimeout(function() {
+        $.ajax({
+            url: buildUrl,
+            dataType: 'json',
+            data: null,
+            success: buildBoatSuccess,
+            error: buildBoatError
+        });
+    }, 500);
+}
+
+function buildBoatSuccess(httpResult) {
+    killHook(true); // Just in case
+    hideLoading(); // Just in case
+    hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
+    killBoats();
+
+    // We didn't get a response, or we got one but with count 0 (server has gone mad?)
+    if (
+        !httpResult ||
+        (httpResult.count === 0 && httpResult.status !== STATUS_NOT_FOUND) ||
+        httpResult.status === STATUS_ERROR
+    ) {
+        buildBoatError({status: 500, message: "Sorry, we can't build this boat, try again later..."});
+        return;
+    }
+
+    renderBoats(httpResult);
+}
+
+function buildBoatError(error) {
+    killHook(true); // Just in case
+    hideLoading(); // Just in case
+    hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
+    killBoats();
+
+    console.log(error);
+    if (error.status === 404) {
+        islandError("Sorry, we couldn't find this company.");
+    } else {
+        // Display error.message when we adjust the API to return better errors
+        islandError("Sorry, we are having trouble building this company.");
+    }
 }
 
 function fatalError(message) {
+    console.log('fatal error');
     // Kill everything again (even though previous function might have killed one or two things)
     killHook(true);
     hideLoading();
@@ -199,13 +281,27 @@ function fatalError(message) {
     killIsland();
     killBoats();
     $('#search').val(''); // Clear search term
+
     // Display octopus and message
     displayOcto();
+    openSnackbar(message);
+}
 
-    // TODO : message (snack + pole!)
+function islandError(message) {
+    console.log('island error');
+    // Kill everything again (even though previous function might have killed one or two things)
+    killHook(true);
+    hideLoading();
+    hideSearchSlow();
+    killBoats();
+
+    // Display island and message
+    displayIsland();
+    openSnackbar(message);
 }
 
 function displayHook() {
+    console.log('display hook');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-search');
     if (existingItems.length === 0) {
@@ -221,6 +317,7 @@ function displayHook() {
 }
 
 function killHook(killFast) {
+    console.log('kill hook');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-search');
     if (killFast) {
@@ -235,25 +332,42 @@ function killHook(killFast) {
     }
 }
 
-function displayBoat(type, level, renderFlag) {
+function displayBoat(type, level, boatContainerId, renderFlag, visible, companyIndex, renderHammer) {
+    console.log('display boat');
+    var enterClass = visible ? " enter-slow" : " boat-hidden";
+    if (enterClass === ' enter-slow' && type === 'canoe-build') {
+        enterClass = ' enter-fast';
+    }
+    var boatNumberClass = " boat-number-" + companyIndex;
     var container = $(BETWEENWAVE_CONTAINER);
-    var boatContainerId = 'boat-' + Date.now() + String.fromCharCode(65 + Math.floor(Math.random() * 26));
-    var html = '<div class="bc-boat boatcontainer enter-slow" id="' + boatContainerId + '">';
+    var html = '<div class="bc-boat boatcontainer' + enterClass + boatNumberClass + '" id="' + boatContainerId + '">';
     html += '<div class="boat bobbler3 size-' + type + ' level-' + level + '">';
     if (renderFlag) {
         html += '<div class="flagcontainer"><canvas class="flag"></canvas></div>';
     }
+    if (renderHammer) {
+        html += '<div class="hammercontainer"><img src="images/hammer.svg" /></div>';
+    }
     html += '<img src="images/' + type + '.svg" /></div>';
     html += '</div>';
     container.prepend(html);
-    // Remove enter animation class after 2 seconds (to avoid re-rendering by mistake)
-    setTimeout(function() {
-        container.children('.bc-boat').removeClass('enter-slow');
-    }, ENTER_SLOW_TIME);
-    return boatContainerId;
+
+    // Remove "enter" animation class after 2 seconds (to avoid re-rendering by mistake)
+    if (visible) {
+        setTimeout(function() {
+            container.children('.bc-boat').removeClass('enter-slow');
+        }, ENTER_SLOW_TIME);
+    }
+
+    // Render flag
+    if (renderFlag) {
+        // Get CEO image from companies (stateful!)
+        displayFlag(companies[companyIndex].gd_ceo.image.src, boatContainerId, 200, 200);
+    }
 }
 
 function killBoats() {
+    console.log('kill boats');
     $('.bc-boat:visible').removeClass('enter-low').addClass('exit');
     setTimeout(function() {
         $('.bc-boat.exit').remove();
@@ -261,8 +375,10 @@ function killBoats() {
 }
 
 function displayIsland() {
+    console.log('show island');
     var container = $(BETWEENWAVE_CONTAINER);
-    var existingItems = container.children('.bc-island');
+    var existingItems = container.children('.bc-island:visible');
+    //existingItems = [];
     if (existingItems.length === 0) {
         // No boats on screen, enter a new island
         var html = '<div class="bc-island boatcontainer enter-low">';
@@ -284,6 +400,7 @@ function displayIsland() {
 }
 
 function killIsland() {
+    console.log('kill island');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-island');
     if (existingItems.length > 0) {
@@ -295,6 +412,7 @@ function killIsland() {
 }
 
 function displayOcto() {
+    console.log('show octo');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-octo');
     if (existingItems.length === 0) {
@@ -318,6 +436,7 @@ function displayOcto() {
 }
 
 function killOcto() {
+    console.log('kill octo');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-octo');
     if (existingItems.length > 0) {
@@ -338,7 +457,7 @@ function hideLoading() {
 
 function displaySearchSlow(hideSnackbar) {
     if (!hideSnackbar) {
-        openSnackbar("Just a sec...", true);
+        openSnackbar("Oops! We're a bit slow today, sorry about that...", true);
     }
     $('#longtimenoload').addClass('bg-long-load').fadeTo(1000, 0.3);
 }
@@ -449,6 +568,10 @@ var openSnackbar = (function() {
 
 function closeSnackbars() {
     $('.snackbar').css('opacity', 0);
+}
+
+function generateUniqueBoatId(index) {
+    return 'boat-' + index + '-' + Date.now() + String.fromCharCode(65 + Math.floor(Math.random() * 26));
 }
 
 cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
