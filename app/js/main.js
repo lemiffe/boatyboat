@@ -124,6 +124,10 @@ function startSearch(companyName) {
     }, 2000);
 
     lastSearchString = companyName;
+
+    analytics.track('Search', {
+        company: companyName
+    });
 }
 
 /**
@@ -165,6 +169,10 @@ function searchError(error) {
     hideLoading(); // Just in case
     hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
 
+    analytics.track('Search failed', {
+        error: error
+    });
+
     // Example error: (error.status >= 500 || error.status === 0);
     fatalError("I have problems... Try again shortly. Sorry!");
 }
@@ -204,6 +212,10 @@ function renderBoats(httpResult) {
             if (companyCount > 1) {
                 // Todo: Arrows + more boats :P
             }
+
+            analytics.track('Rendered boats', {
+                companies: companies
+            });
             break;
         default:
             searchError({status: 500});
@@ -236,6 +248,10 @@ function buildBoat(companyName) {
             error: buildBoatError
         });
     }, 500);
+
+    analytics.track('Building boat', {
+        company: companyName
+    });
 }
 
 function buildBoatSuccess(httpResult) {
@@ -270,6 +286,10 @@ function buildBoatError(error) {
         // Display error.message when we adjust the API to return better errors
         islandError("Sorry, we are having trouble building this company.");
     }
+
+    analytics.track('Build failed', {
+        error: error
+    });
 }
 
 function fatalError(message) {
@@ -285,6 +305,10 @@ function fatalError(message) {
     // Display octopus and message
     displayOcto();
     openSnackbar(message);
+
+    analytics.track('Fatal error', {
+        message: message
+    });
 }
 
 function islandError(message) {
