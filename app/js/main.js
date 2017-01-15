@@ -23,7 +23,8 @@ var requiredImages = [
     '../images/octo.svg',
     '../images/hammer.svg',
     '../images/clouds.png',
-    '../images/seigaiha.png'
+    '../images/seigaiha.png',
+    '../images/floor.png'
 ];
 var BETWEENWAVE_CONTAINER = '.betweenwaves';
 var HOOK_EXIT_TIME = 1500;
@@ -65,6 +66,9 @@ $(document).ready(function() {
             displayIsland();
         }
     });
+
+    // LOL
+    window.angular = jQuery;
 });
 
 function handleInput(e) {
@@ -137,6 +141,12 @@ function startSearch(companyName) {
  * @return void
  */
 function searchSuccess(httpResult) {
+    // If search string has changed in the meantime (slow search?) don't render, as next item will render soon!
+    var currentCompanyName = $('#search').val();
+    if (lastSearchString !== currentCompanyName) {
+        return;
+    }
+
     searching = false;
     killHook(false); // Kill slowly
     hideLoading(); // Just in case
@@ -159,6 +169,12 @@ function searchSuccess(httpResult) {
  * @param error
  */
 function searchError(error) {
+    // If search string has changed in the meantime (slow search?) don't render, as next item will render soon!
+    var currentCompanyName = $('#search').val();
+    if (lastSearchString !== currentCompanyName) {
+        return;
+    }
+
     searching = false;
     var killFast = false;
     var searchEndTime = new Date().getTime();
@@ -206,7 +222,8 @@ function renderBoats(httpResult) {
                 var boatContainerId = generateUniqueBoatId(index);
                 var visible = (index === 0);
                 // Todo: Depending on boat status we want to display either a full construction, or a boat and hammer
-                displayBoat('canoe', 'sea', boatContainerId, renderFlag, visible, index, false);
+                // Status: floating|rising|falling, sailing|lifting|leaking, submerged|surfacing|sinking, sunk, unknown
+                displayBoat('canoe', company.boat_status, boatContainerId, renderFlag, visible, index, false);
             });
 
             if (companyCount > 1) {
@@ -233,7 +250,7 @@ function buildBoat(companyName) {
     killIsland();
     killOcto();
     var boatContainerId = generateUniqueBoatId(0);
-    displayBoat('canoe-build', 'sea', boatContainerId, false, true, -1, true);
+    displayBoat('canoe-build', 'sailing', boatContainerId, false, true, -1, true);
 
     // Create company
     var encodedSearch = encodeURIComponent(companyName);
@@ -255,6 +272,12 @@ function buildBoat(companyName) {
 }
 
 function buildBoatSuccess(httpResult) {
+    // If search string has changed in the meantime (slow search?) don't render, as next item will render soon!
+    var currentCompanyName = $('#search').val();
+    if (lastSearchString !== currentCompanyName) {
+        return;
+    }
+
     killHook(true); // Just in case
     hideLoading(); // Just in case
     hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
@@ -274,6 +297,12 @@ function buildBoatSuccess(httpResult) {
 }
 
 function buildBoatError(error) {
+    // If search string has changed in the meantime (slow search?) don't render, as next item will render soon!
+    var currentCompanyName = $('#search').val();
+    if (lastSearchString !== currentCompanyName) {
+        return;
+    }
+
     killHook(true); // Just in case
     hideLoading(); // Just in case
     hideSearchSlow(); // Remove "slow search" message (in case it's still visible)
@@ -356,6 +385,17 @@ function killHook(killFast) {
     }
 }
 
+/**
+ * Display boat (and/or hammer)
+ * Levels: floating|rising|falling, sailing|lifting|leaking, submerged|surfacing|sinking, sunk, unknown
+ * @param type
+ * @param level
+ * @param boatContainerId
+ * @param renderFlag
+ * @param visible
+ * @param companyIndex
+ * @param renderHammer
+ */
 function displayBoat(type, level, boatContainerId, renderFlag, visible, companyIndex, renderHammer) {
     console.log('display boat');
     var enterClass = visible ? " enter-slow" : " boat-hidden";
@@ -364,10 +404,30 @@ function displayBoat(type, level, boatContainerId, renderFlag, visible, companyI
     }
     var boatNumberClass = " boat-number-" + companyIndex;
     var container = $(BETWEENWAVE_CONTAINER);
+    var bobbleClass = (level !== "sunk") ? " bobbler3" : "";
     var html = '<div class="bc-boat boatcontainer' + enterClass + boatNumberClass + '" id="' + boatContainerId + '">';
-    html += '<div class="boat bobbler3 size-' + type + ' level-' + level + '">';
+    html += '<div class="boat' + bobbleClass + ' size-' + type + ' level-' + level + '">';
     if (renderFlag) {
         html += '<div class="flagcontainer"><canvas class="flag"></canvas></div>';
+    }
+    if (level === "floating" || level === "rising" || level === "falling") {
+        html += '<div class="boostcontainer">';
+        html += '<div class="boost-left"><img src="images/fire.gif" class="fire-left" /></div>';
+        html += '<div class="boost-right"><img src="images/fire.gif" class="fire-right" /></div>';
+        html += '</div>';
+
+        // Move waves down
+        // TODO: When using arrows to switch between boats we need to re-calibrate
+        if (visible === true) {
+            $('.wavecontainer:visible').css('top', '250px');
+        }
+
+    } else {
+        // Move waves up
+        // TODO: When using arrows to switch between boats we need to re-calibrate
+        if (visible === true) {
+            $('.wavecontainer:visible').css('top', '150px');
+        }
     }
     if (renderHammer) {
         html += '<div class="hammercontainer"><img src="images/hammer.svg" /></div>';
