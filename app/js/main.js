@@ -125,7 +125,7 @@ function startSearch(companyName) {
         if (searching === true && lastSearchString === companyName) {
             displaySearchSlow();
         }
-    }, 2000);
+    }, 3000);
 
     lastSearchString = companyName;
 
@@ -460,6 +460,7 @@ function killBoats() {
 
 function displayIsland() {
     console.log('show island');
+    $('.wavecontainer:visible').css('top', '150px');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-island:visible');
     //existingItems = [];
@@ -497,6 +498,7 @@ function killIsland() {
 
 function displayOcto() {
     console.log('show octo');
+    $('.wavecontainer:visible').css('top', '150px');
     var container = $(BETWEENWAVE_CONTAINER);
     var existingItems = container.children('.bc-octo');
     if (existingItems.length === 0) {
@@ -595,8 +597,6 @@ function displayFlag(url, boatContainerId, width, height) {
         var ctx=canvas.getContext("2d");
 
         var img=new Image();
-        img.onload=start;
-        img.src=faceImg.src;
         function start(){
 
             var iw=img.width;
@@ -609,6 +609,9 @@ function displayFlag(url, boatContainerId, width, height) {
                 ctx.drawImage(img, x,0,1,ih,  x,y,1,ih);
             }
         }
+
+        img.onload=start;
+        img.src=faceImg.src;
     }
 }
 
@@ -658,7 +661,7 @@ function generateUniqueBoatId(index) {
     return 'boat-' + index + '-' + Date.now() + String.fromCharCode(65 + Math.floor(Math.random() * 26));
 }
 
-cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
+cheet('howdoiturnthison', function () {
     fatalError('Smarty pants!');
     displaySearchSlow(true);
 });
