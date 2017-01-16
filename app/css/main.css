@@ -43,6 +43,11 @@ body {
     max-width: 250px;
     float: right;
     z-index: 5;
+    opacity: 0.5;
+}
+
+.searchcontainer .input-group.active {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -134,7 +139,7 @@ body {
 
 .wave {
     height: 100px;
-    width: 2000px;
+    width: 2300px;
     position: relative;
 }
 
@@ -199,6 +204,10 @@ body {
     padding-right: 20px;
 }
 
+.boat.size-canoe img {
+    height: 130px;
+}
+
 .boat.size-canoe.level-floating,
 .boat.size-canoe.level-rising,
 .boat.size-canoe.level-falling{
@@ -221,19 +230,52 @@ body {
     right: 0;
 }
 
+.boat.size-bucket.level-sunk {
+    bottom: 5px;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.boat.size-bucket img {
+    height: 130px;
+}
+
+.boat.size-bucket.level-floating,
+.boat.size-bucket.level-rising,
+.boat.size-bucket.level-falling{
+    margin-top: 110px;
+}
+
+.boat.size-bucket.level-sailing,
+.boat.size-bucket.level-lifting,
+.boat.size-bucket.level-leaking,
+.boat.size-bucket.level-unknown {
+    margin-top: 170px;
+}
+
+.boat.size-bucket.level-submerged,
+.boat.size-bucket.level-surfacing,
+.boat.size-bucket.level-sinking {
+    bottom: 46%;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.boat.size-bucket.level-sunk {
+    bottom: 5px;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
 .boat.level-leaking {
     margin-top: 210px;
 }
 
 .boat.level-lifting {
     margin-top: 150px;
-}
-
-.boat.size-canoe.level-sunk {
-    bottom: 5px;
-    position: absolute;
-    left: 0;
-    right: 0;
 }
 
 .boat.level-rising,
@@ -253,10 +295,6 @@ body {
 .boat.level-unknown {
     -webkit-animation: bobble3-flipped 6s infinite; /* Safari 4.0 - 8.0 */
     animation: bobble3-flipped 6s infinite;
-}
-
-.boat.size-canoe img {
-    height: 130px;
 }
 
 .boat.size-canoe-build.level-sailing,
@@ -445,6 +483,14 @@ body {
     min-width: 288px;
     max-width: 568px;
     z-index: 5;
+}
+
+/* HELPERS */
+
+.hidden {
+    display: none !important;
+    position: absolute;
+    left: -1000px;
 }
 
 /* ANIMATIONS */

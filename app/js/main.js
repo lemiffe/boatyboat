@@ -17,6 +17,7 @@ var companies = [];
 // Constants
 var requiredImages = [
     '../images/canoe.svg',
+    '../images/bucket.svg',
     '../images/canoe-build.svg',
     '../images/island.svg',
     '../images/hook.svg',
@@ -40,7 +41,13 @@ var STATUS_FULL_UPDATE_REQUIRED = 'full update required';
 $(document).ready(function() {
     // Search input handler + debouncer
     var searchEl = $('#search');
-    searchEl.focus().select().keyup($.debounce(600, handleInput));
+    searchEl.blur(function() {
+        $('.searchcontainer .input-group').removeClass('active');
+    });
+    searchEl.focus(function() {
+        $('.searchcontainer .input-group').addClass('active');
+    });
+    searchEl.keyup($.debounce(600, handleInput));
 
     // Search icon click handler
     $('.searchcontainer .input-group-addon').on('click touchstart', function() {
@@ -54,6 +61,7 @@ $(document).ready(function() {
         // After loading initial assets
         hideLoading();
         searchEl.prop('disabled', false);
+        searchEl.focus().select();
 
         // Display initial state or start search
         if (window.location.hash && window.location.hash.trim().length > 1) {
@@ -223,7 +231,13 @@ function renderBoats(httpResult) {
                 var visible = (index === 0);
                 // Todo: Depending on boat status we want to display either a full construction, or a boat and hammer
                 // Status: floating|rising|falling, sailing|lifting|leaking, submerged|surfacing|sinking, sunk, unknown
-                displayBoat('canoe', company.boat_status, boatContainerId, renderFlag, visible, index, false);
+                var boatSize = 'bucket';
+                if (company.fc_aprox_employees) {
+                    if (company.fc_aprox_employees >= 100) {
+                        boatSize = 'canoe';
+                    }
+                }
+                displayBoat(boatSize, company.boat_status, boatContainerId, renderFlag, visible, index, false);
             });
 
             if (companyCount > 1) {
@@ -453,8 +467,10 @@ function displayBoat(type, level, boatContainerId, renderFlag, visible, companyI
 function killBoats() {
     console.log('kill boats');
     $('.bc-boat:visible').removeClass('enter-low').addClass('exit');
+    $('.bc-boat:hidden').removeClass('enter-low').addClass('schedule-exit');
     setTimeout(function() {
         $('.bc-boat.exit').remove();
+        $('.bc-boat.schedule-exit').remove();
     }, EXIT_TIME + 150);
 }
 
@@ -585,6 +601,7 @@ function displayFlag(url, boatContainerId, width, height) {
         img.width = width;
         img.height = height;
         img.style = 'display: none;';
+        img.className = 'hidden';
         img.id = 'faceimg-' + boatContainerId;
         document.getElementById(boatContainerId).appendChild(img);
     }
