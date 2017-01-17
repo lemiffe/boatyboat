@@ -678,7 +678,7 @@ function generateUniqueBoatId(index) {
     return 'boat-' + index + '-' + Date.now() + String.fromCharCode(65 + Math.floor(Math.random() * 26));
 }
 
-cheet('howdoiturnthison', function () {
+cheet('h o w d o y o u t u r n t h i s o n', function () {
     fatalError('Smarty pants!');
     displaySearchSlow(true);
 });
