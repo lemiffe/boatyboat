@@ -1,0 +1,18 @@
+title: BoatyBoat Records
+tagline: Music by Hoomans
+description: 'BoatyBoat Records, the home of handcrafted music with love, patience and humanity. AI is a tool, not a replacement'
+url: https://boatyboat.com
+baseurl: ''
+paginate: 5
+paginate_path: /blog/page:num/
+permalink: /:title
+
+author:
+    name: BoatyBoat
+    url: https://twitter.com/boatyboatrecords
+
+plugins:
+    - jekyll-paginate
+
+version: 1.1.0
+google_analytics_id: #UA-XXXX-Y
