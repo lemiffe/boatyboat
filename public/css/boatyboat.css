@@ -47,7 +47,8 @@ body {
 /* TEXT */
 
 .masthead-title {
-    font-size: 2em;
+    font-size: 2.8em;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .masthead-title small {
@@ -65,6 +66,15 @@ body {
 
 .masthead-title a:hover, .masthead-title a:focus {
     text-decoration: none;
+}
+
+.masthead-subtitle {
+    background-color: white;
+    margin-bottom: 25px;
+    width: auto;
+    display: inline-block;
+    padding: 8px 15px;
+    font-weight: bold;
 }
 
 /* SIDEBAR */
@@ -270,6 +280,8 @@ a.button.green:hover, a.button.green:focus {
 
 .boat {
     margin: 0 auto;
+    overflow: hidden;
+    text-align: center;
 }
 
 .boat img {
@@ -281,6 +293,7 @@ a.button.green:hover, a.button.green:focus {
 .boat.size-canoe img {
     height: 130px;
     margin-top: 100px;
+    max-width: 100%;
 }
 
 /* OCTOPUS */
