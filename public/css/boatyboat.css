@@ -8,16 +8,20 @@ body {
 }
 
 .sky {
-    height: 800px;
+    height: 420px;
     position: absolute;
     width: 100%;
     z-index: -1;
     top: 0;
     background: #e8fcff; /* Old browsers */
-    background: -moz-linear-gradient(top, #ffffff 0%, #e8fcff 10%, #e8fcff 25%, #ffffff 50%, #e8fcff 100%);
-    background: -webkit-linear-gradient(top, #ffffff 0%, #e8fcff 10%, #e8fcff 25%, #ffffff 50%, #e8fcff 100%);
-    background: linear-gradient(to bottom, #ffffff 0%, #e8fcff 10%, #e8fcff 25%, #ffffff 50%, #e8fcff 100%);
+    background: linear-gradient(to bottom, rgb(253 253 253) 0%, #ffffff 40%, rgb(222 238 240 / 20%) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e8fcff',GradientType=0 ); /* IE6-9 */
+}
+
+.night {
+    background: #06518e;
+    padding-top: 25px;
+    padding-bottom: 25px;
 }
 
 .logo {
@@ -44,6 +48,77 @@ body {
     margin-bottom: 35px;
 }
 
+.info-boxes {
+    margin-top: 10px;
+    margin-bottom: 0;
+    align-items: right;
+    text-align: right;
+}
+
+.le-box {
+    color: black;
+    background: white;
+    font-weight: bold;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 0;
+    margin-left: 5px;
+}
+
+.album-details a {
+    background-color: white;
+    border-radius: 30px;
+    padding: 7px 15px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.album-details a:hover, .album-details a:focus,
+.le-box a:hover, .le-box a:focus {
+    text-decoration: none;
+}
+
+.album-details a img,
+.le-box a img {
+    height: 20px;
+    margin-top: -3px;
+}
+
+.info {
+    text-align: left;
+}
+
+.info h2:first-of-type {
+    margin-top: 0
+}
+
+.info h2 {
+    background-color: white;
+    padding: 8px 20px;
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.info p:first-of-type {
+    margin-top: 15px;
+}
+
+.info p {
+    background: #8bbf7f;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 35px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.info audio {
+    margin-left: -7px;
+}
+
 /* TEXT */
 
 .masthead-title {
@@ -68,13 +143,35 @@ body {
     text-decoration: none;
 }
 
-.masthead-subtitle {
+.info-boxes.sub-title {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.masthead-subtitle, .le-box {
     background-color: white;
-    margin-bottom: 25px;
     width: auto;
     display: inline-block;
     padding: 8px 15px;
     font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.masthead-description {
+    background-color: white;
+    width: auto;
+    display: inline-block;
+    padding: 15px 15px 8px 15px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.masthead-description p {
+    line-height: 1.6em;
+}
+
+.masthead-description a, masthead-description a:link {
+    color: #F23F2D;
 }
 
 /* SIDEBAR */
@@ -205,24 +302,26 @@ a.button.green:hover, a.button.green:focus {
 
 .wavecontainer.frontwave .underwave {
     background-color: rgba(111, 214, 255, 1);
+    background: linear-gradient(to bottom, rgb(111, 214, 255) 0%, rgb(124, 217, 255) 100%);
 }
 
 .wavecontainer.backwave {
     z-index: 0;
-    opacity: 0.6;
+    opacity: 1;
     transition: all 0.5s ease;
 }
 
 .wavecontainer.backwave .wave:before {
-    background-image: radial-gradient(circle at 20px -10px, transparent 24px, #b7ebfd 26px);
+    background-image: radial-gradient(circle at 20px -10px, transparent 24px, #c4efff 26px);
 }
 
 .wavecontainer.backwave .wave:after {
-    background-image: radial-gradient(circle at 20px 30px, #b7ebfd 24px, transparent 26px);
+    background-image: radial-gradient(circle at 20px 30px, #c4efff 24px, transparent 26px);
 }
 
 .wavecontainer.backwave .underwave {
-    background-color: #b7ebfd;
+    background-color: #c4efff;
+    background: linear-gradient(to bottom, rgb(196, 239, 255) 0%, rgb(124, 217, 255) 100%);
 }
 
 .wave {
